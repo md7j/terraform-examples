@@ -118,7 +118,7 @@ QUERY
   }
 }
 
-module "vpc1" {
+module "vpc4" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.0.0"
   # ARN of Outpost you want to create a subnet in.
