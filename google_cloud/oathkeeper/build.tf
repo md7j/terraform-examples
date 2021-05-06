@@ -27,13 +27,15 @@ resource "local_file" "config" {
 # Required to connect to Cloud SQL
 # Built using Cloud Build, image stored in GCR
 resource "null_resource" "oathkeeper_image" {
-  depends_on = [module.docker-mirror]
+  depends_on = [
+    module.docker-mirror,
+  ]
   triggers = {
     # Rebuild if we change the base image, dockerfile, or bpm-platform config
     image = "eu.gcr.io/${local.project}/oathkeeper:${local.base_image_tag}_${
       sha1(
         "${sha1(local_file.dockerfile.content)}${sha1(local_file.config.content)}"
-      )  
+      )
     }"
   }
   provisioner "local-exec" {

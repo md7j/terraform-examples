@@ -2,7 +2,6 @@
 data "aws_availability_zones" "this" {}
 
 # Retrieve info about the VPC this host should join
-
 data "aws_vpc" "this" {
   default = "${var.vpc_id == "" ? true : false}"
   id      = "${var.vpc_id}"

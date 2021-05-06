@@ -21,7 +21,6 @@ Features
   - Reserved 10Gb disk costs: $0.40
   - VM cost: $0.01 per hour, max session cost $0.24
 */
-
 # We require a project to be provided upfront
 # Create a project at https://cloud.google.com/
 # Make note of the project ID
@@ -47,10 +46,9 @@ locals {
   # through the Cloud Console mobile app or https://console.cloud.google.com
   # Create a group at https://groups.google.com/forum/#!creategroup
   # and invite members by their email address.
-  enable_switch_access_group = 1
+  enable_switch_access_group    = 1
   minecraft_switch_access_group = "minecraft-switchers-lark@googlegroups.com"
 }
-
 
 provider "google" {
   project = local.project
@@ -82,8 +80,9 @@ resource "google_compute_instance" "minecraft" {
   name         = "minecraft"
   machine_type = "n1-standard-1"
   zone         = local.zone
-  tags         = ["minecraft"]
-
+  tags = [
+    "minecraft",
+  ]
   # Run itzg/minecraft-server docker image on startup
   # The instructions of https://hub.docker.com/r/itzg/minecraft-server/ are applicable
   # For instance, Ssh into the instance and you can run
@@ -92,28 +91,25 @@ resource "google_compute_instance" "minecraft" {
   # Once in rcon-cli you can "op <player_id>" to make someone an operator (admin)
   # Use 'sudo journalctl -u google-startup-scripts.service' to retrieve the startup script output
   metadata_startup_script = "docker run -d -p 25565:25565 -e EULA=TRUE -e VERSION=1.12.2 -v /var/minecraft:/data --name mc -e TYPE=FORGE -e FORGEVERSION=14.23.0.2552 -e MEMORY=2G --rm=true itzg/minecraft-server:latest;"
-
   metadata = {
     enable-oslogin = "TRUE"
   }
-      
   boot_disk {
     auto_delete = false # Keep disk after shutdown (game data)
     source      = google_compute_disk.minecraft.self_link
   }
-
   network_interface {
     network = google_compute_network.minecraft.name
     access_config {
       nat_ip = google_compute_address.minecraft.address
     }
   }
-
   service_account {
-    email  = google_service_account.minecraft.email
-    scopes = ["userinfo-email"]
+    email = google_service_account.minecraft.email
+    scopes = [
+      "userinfo-email",
+    ]
   }
-
   scheduling {
     preemptible       = true # Closes within 24 hours (sometimes sooner)
     automatic_restart = false
@@ -133,7 +129,9 @@ resource "google_compute_firewall" "minecraft" {
   # Minecraft client port
   allow {
     protocol = "tcp"
-    ports    = ["25565"]
+    ports = [
+      "25565",
+    ]
   }
   # ICMP (ping)
   allow {
@@ -142,44 +140,56 @@ resource "google_compute_firewall" "minecraft" {
   # SSH (for RCON-CLI access)
   allow {
     protocol = "tcp"
-    ports    = ["22"]
+    ports = [
+      "22",
+    ]
   }
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["minecraft"]
+  source_ranges = [
+    "0.0.0.0/0",
+  ]
+  target_tags = [
+    "minecraft",
+  ]
 }
 
 resource "google_project_iam_custom_role" "minecraftSwitcher" {
   role_id     = "MinecraftSwitcher"
   title       = "Minecraft Switcher"
   description = "Can turn a VM on and off"
-  permissions = ["compute.instances.start", "compute.instances.stop", "compute.instances.get"]
+  permissions = [
+    "compute.instances.start",
+    "compute.instances.stop",
+    "compute.instances.get",
+  ]
 }
 
 resource "google_project_iam_custom_role" "instanceLister" {
   role_id     = "InstanceLister"
   title       = "Instance Lister"
   description = "Can list VMs in project"
-  permissions = ["compute.instances.list"]
+  permissions = [
+    "compute.instances.list",
+  ]
 }
 
 resource "google_compute_instance_iam_member" "switcher" {
-  count = local.enable_switch_access_group
-  project = local.project
-  zone = local.zone
+  count         = local.enable_switch_access_group
+  project       = local.project
+  zone          = local.zone
   instance_name = google_compute_instance.minecraft.name
-  role = google_project_iam_custom_role.minecraftSwitcher.id
-  member = "group:${local.minecraft_switch_access_group}"
+  role          = google_project_iam_custom_role.minecraftSwitcher.id
+  member        = "group:${local.minecraft_switch_access_group}"
 }
 
 resource "google_project_iam_member" "projectBrowsers" {
-  count = local.enable_switch_access_group
+  count   = local.enable_switch_access_group
   project = local.project
   role    = "roles/browser"
   member  = "group:${local.minecraft_switch_access_group}"
 }
 
 resource "google_project_iam_member" "computeViewer" {
-  count = local.enable_switch_access_group
+  count   = local.enable_switch_access_group
   project = local.project
   role    = google_project_iam_custom_role.instanceLister.id
   member  = "group:${local.minecraft_switch_access_group}"

@@ -1,4 +1,3 @@
-
 locals {
   project           = "larkworthy-tester"
   project_number    = "455826092000"
@@ -44,6 +43,7 @@ resource "google_project_iam_member" "openresty_publisher" {
   role    = "roles/pubsub.publisher"
   member  = "serviceAccount:${google_service_account.openresty.email}"
 }
+
 resource "google_project_iam_member" "openresty_subscriber" {
   project = local.project
   role    = "roles/pubsub.subscriber"
@@ -53,8 +53,10 @@ resource "google_project_iam_member" "openresty_subscriber" {
 # Policy to allow public access to Cloud Run endpoint
 data "google_iam_policy" "noauth" {
   binding {
-    role    = "roles/run.invoker"
-    members = ["allUsers"]
+    role = "roles/run.invoker"
+    members = [
+      "allUsers",
+    ]
   }
 }
 
@@ -96,7 +98,7 @@ resource "template_dir" "swiss" {
 # Create a zip just to generate a sha
 data "archive_file" "swiss" {
   type        = "zip"
-  source_dir = "${path.module}/.build/swiss"
+  source_dir  = "${path.module}/.build/swiss"
   output_path = "/tmp/swiss.zip"
 }
 
@@ -113,7 +115,6 @@ resource "google_cloud_run_service" "openresty" {
       }
     }
   }
-
   traffic {
     percent         = 100
     latest_revision = true
@@ -132,13 +133,11 @@ resource "google_project_iam_member" "pubsub_token_creator" {
 }
 
 resource "google_pubsub_subscription" "httpwal" {
-  name  = "httpwal"
-  topic = google_pubsub_topic.httpwal.name
-
+  name                 = "httpwal"
+  topic                = google_pubsub_topic.httpwal.name
   ack_deadline_seconds = 120
   push_config {
     push_endpoint = "${local.service_url}/wal-playback/"
-
     oidc_token {
       service_account_email = google_service_account.openresty.email
     }

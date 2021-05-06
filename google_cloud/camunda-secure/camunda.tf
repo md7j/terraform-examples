@@ -69,7 +69,6 @@ resource "google_cloud_run_service" "camunda" {
         }
       }
     }
-
     metadata {
       annotations = {
         "autoscaling.knative.dev/maxScale"      = "1" # no clusting
@@ -77,7 +76,6 @@ resource "google_cloud_run_service" "camunda" {
       }
     }
   }
-
   traffic {
     percent         = 100
     latest_revision = true

@@ -1,24 +1,20 @@
 # Key vault access for the current client principal
 resource "azurerm_key_vault_access_policy" "principal" {
   key_vault_id = azurerm_key_vault.current.id
-
-  tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = data.azurerm_client_config.current.object_id
-
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = data.azurerm_client_config.current.object_id
   secret_permissions = [
     "get",
     "set",
-    "delete"
+    "delete",
   ]
 }
 
 # Key vault access for the App Service
 resource "azurerm_key_vault_access_policy" "app_service" {
   key_vault_id = azurerm_key_vault.current.id
-
-  tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = azurerm_app_service.current.identity.0.principal_id
-
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_app_service.current.identity.0.principal_id
   secret_permissions = [
     "get",
   ]
@@ -27,10 +23,8 @@ resource "azurerm_key_vault_access_policy" "app_service" {
 # Key vault access for the App Service's next slot
 resource "azurerm_key_vault_access_policy" "app_service_next_slot" {
   key_vault_id = azurerm_key_vault.current.id
-
-  tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = azurerm_app_service_slot.next.identity.0.principal_id
-
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_app_service_slot.next.identity.0.principal_id
   secret_permissions = [
     "get",
   ]

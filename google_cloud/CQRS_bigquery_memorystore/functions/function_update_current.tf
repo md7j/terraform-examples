@@ -6,15 +6,13 @@ resource "google_cloudfunctions_function" "update_current" {
   name    = "update_current"
   runtime = "nodejs10"
   /* Running BQ client has minimal resource requirements */
-  max_instances       = 1
-  available_memory_mb = 128
-  timeout             = 30
-  entry_point         = "materialize"
-  region              = var.config.region
-
+  max_instances         = 1
+  available_memory_mb   = 128
+  timeout               = 30
+  entry_point           = "materialize"
+  region                = var.config.region
   source_archive_bucket = var.config.code_bucket.name
   source_archive_object = google_storage_bucket_object.materialize_code.name
-
   // Function triggered by mutations in the upload bucket
   event_trigger {
     event_type = "providers/cloud.pubsub/eventTypes/topic.publish"
@@ -23,7 +21,6 @@ resource "google_cloudfunctions_function" "update_current" {
       retry = false
     }
   }
-
   environment_variables = {
     PROJECT        = var.config.project
     DATASET        = var.current_totals_table.dataset_id

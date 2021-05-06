@@ -28,7 +28,7 @@ variable "viewer_https_only" {
 
 variable "cache_ttl_override" {
   description = "When >= 0, override the cache behaviour for ALL objects in the origin, so that they stay in the CloudFront cache for this amount of seconds"
-  default     = -1
+  default     = 1
 }
 
 variable "default_root_object" {
@@ -39,7 +39,6 @@ variable "default_root_object" {
 variable "add_response_headers" {
   description = "Map of HTTP headers (if any) to add to outgoing responses before sending them to clients"
   type        = "map"
-
   default = {
     "Strict-Transport-Security" = "max-age=31557600; preload" # i.e. 1 year (in seconds)
   }
@@ -47,7 +46,6 @@ variable "add_response_headers" {
 
 variable "origin_custom_header_name" {
   description = "Name of a custom header to send to the origin; this can be used to convey an authentication header to the origin, for example"
-
   # Unfortunately, since Terraform doesn't allow conditional inline blocks (yet), we need to ALWAYS have SOME header here.
   # This default one will be sent if a custom one isn't defined, but it's assumed to be harmless.
   default = "X-Custom-Origin-Header"

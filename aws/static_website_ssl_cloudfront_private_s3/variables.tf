@@ -26,7 +26,6 @@ variable "default_root_object" {
   default     = "index.html"
 }
 
-
 variable "default_ttl" {
   description = "The default amount of time (in secs) that an object is cached in cloudfront in the absence of Cache-Control max-age or Expires header."
   default     = "86400"
@@ -46,7 +45,6 @@ variable "error_ttl" {
   description = "The minimum amount of time (in secs) that cloudfront caches an HTTP error code."
   default     = "30"
 }
-
 
 locals {
   s3_origin_id = "myS3Origin"

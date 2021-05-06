@@ -19,14 +19,14 @@ resource "local_file" "dockerfile" {
 # Hydrate bpm-platform config into .build directory
 resource "local_file" "bpm-platform" {
   content = templatefile("${path.module}/config/bpm-platform.xml.template", {
-    maxJobsPerAcquisition = null
-    lockTimeInMillis = null
-    waitTimeInMillis = 1
-    maxWait = null
-    history = "none"
-    databaseSchemaUpdate = null # default
-    authorizationEnabled = null # default
-    jobExecutorDeploymentAware = "false"
+    maxJobsPerAcquisition              = null
+    lockTimeInMillis                   = null
+    waitTimeInMillis                   = 1
+    maxWait                            = null
+    history                            = "none"
+    databaseSchemaUpdate               = null # default
+    authorizationEnabled               = null # default
+    jobExecutorDeploymentAware         = "false"
     historyCleanupBatchWindowStartTime = null # default
   })
   filename = "${path.module}/.build/bpm-platform.xml"
@@ -36,13 +36,15 @@ resource "local_file" "bpm-platform" {
 # Required to connect to Cloud SQL
 # Built using Cloud Build, image stored in GCR
 resource "null_resource" "camunda_cloudsql_image" {
-  depends_on = [module.docker-mirror-camunda-bpm-platform]
+  depends_on = [
+    module.docker-mirror-camunda-bpm-platform,
+  ]
   triggers = {
     # Rebuild if we change the base image, dockerfile, or bpm-platform config
     image = "eu.gcr.io/${local.project}/camunda_secure:${local.config.base_image_tag}_${
       sha1(
         "${sha1(local_file.dockerfile.content)}${sha1(local_file.bpm-platform.content)}"
-      )  
+      )
     }"
   }
   provisioner "local-exec" {

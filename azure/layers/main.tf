@@ -19,7 +19,9 @@ resource "azurerm_virtual_network" "network" {
   name                = "${var.resource_name_prefix}-network"
   location            = var.location
   resource_group_name = azurerm_resource_group.network.name
-  address_space       = ["10.137.0.0/16"]
+  address_space = [
+    "10.137.0.0/16",
+  ]
 }
 
 resource "azurerm_subnet" "subnet" {
@@ -27,12 +29,13 @@ resource "azurerm_subnet" "subnet" {
   virtual_network_name = azurerm_virtual_network.network.name
   resource_group_name  = azurerm_resource_group.network.name
   address_prefix       = "10.137.1.0/24"
-  service_endpoints    = ["Microsoft.KeyVault"]
-
+  service_endpoints = [
+    "Microsoft.KeyVault",
+  ]
   lifecycle {
     ignore_changes = [
       network_security_group_id,
-      route_table_id
+      route_table_id,
     ]
   }
 }

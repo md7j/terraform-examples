@@ -11,8 +11,7 @@ resource "aws_internet_gateway" "main-igw" {
 }
 
 ########### NAT ##############
-resource "aws_eip" "nat" {
-}
+resource "aws_eip" "nat" {}
 
 resource "aws_nat_gateway" "main-natgw" {
   allocation_id = aws_eip.nat.id
@@ -27,10 +26,8 @@ resource "aws_nat_gateway" "main-natgw" {
 }
 
 ############# Route Tables ##########
-
 resource "aws_route_table" "PublicRouteTable" {
   vpc_id = aws_vpc.msk_vpc.id
-
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.main-igw.id
@@ -42,7 +39,6 @@ resource "aws_route_table" "PublicRouteTable" {
       "Description", "Public-Routetable"
     )
   )
-
 }
 
 resource "aws_route_table" "PrivateRouteTable" {
@@ -61,7 +57,6 @@ resource "aws_route_table" "PrivateRouteTable" {
 }
 
 #########Route Table Association #############
-
 resource "aws_route_table_association" "route_Publicsubnet" {
   subnet_id      = element(aws_subnet.public_subnet.*.id, count.index)
   count          = length(var.public_subnet_cidrs)

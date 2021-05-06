@@ -5,7 +5,6 @@ resource "aws_api_gateway_rest_api" "this" {
 
 resource "aws_api_gateway_deployment" "this" {
   rest_api_id = "${aws_api_gateway_rest_api.this.id}"
-
   depends_on = [
     "aws_api_gateway_integration.proxy_root",
     "aws_api_gateway_integration.proxy_other",
@@ -24,7 +23,6 @@ resource "aws_api_gateway_method_settings" "this" {
   rest_api_id = "${aws_api_gateway_rest_api.this.id}"
   stage_name  = "${aws_api_gateway_stage.this.stage_name}"
   method_path = "*/*"
-
   settings {
     metrics_enabled        = "${var.api_gateway_cloudwatch_metrics}"
     logging_level          = "${var.api_gateway_logging_level}"
@@ -37,9 +35,10 @@ resource "aws_api_gateway_method_settings" "this" {
 resource "aws_api_gateway_domain_name" "this" {
   domain_name              = "${var.api_domain}"
   regional_certificate_arn = "${aws_acm_certificate_validation.this.certificate_arn}"
-
   endpoint_configuration {
-    types = ["REGIONAL"]
+    types = [
+      "REGIONAL",
+    ]
   }
 }
 

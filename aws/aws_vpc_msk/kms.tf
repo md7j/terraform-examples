@@ -28,6 +28,7 @@ resource "aws_kms_alias" "pca-kims-alias" {
 resource "random_id" "kms" {
   byte_length = 2
 }
+
 resource "aws_kms_key" "msk-kms-key" {
   description         = "KMS Key for encrypting the EBS volumes"
   enable_key_rotation = "true"

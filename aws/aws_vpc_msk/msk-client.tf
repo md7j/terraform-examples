@@ -4,10 +4,8 @@ resource "aws_iam_instance_profile" "KafkaClientIAM_Profile" {
 }
 
 resource "aws_iam_role" "KafkaClientIAM_Role" {
-  name = "KafkaClientIAM_Role"
-  path = "/"
-
-
+  name               = "KafkaClientIAM_Role"
+  path               = "/"
   assume_role_policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -36,13 +34,15 @@ resource "aws_iam_role_policy_attachment" "Kafka-Client-IAM-role-att2" {
 }
 
 resource "aws_instance" "Kafka-Client-EC2-Instance" {
-  ami                    = var.msk_ami
-  instance_type          = var.msk_instance_type
-  key_name               = var.key_name
-  vpc_security_group_ids = [aws_security_group.KafkaClientInstanceSG.id]
-  user_data              = file("./kafka-client-msk.sh")
-  subnet_id              = aws_subnet.private_subnet[1].id
-  iam_instance_profile   = aws_iam_instance_profile.KafkaClientIAM_Profile.name
+  ami           = var.msk_ami
+  instance_type = var.msk_instance_type
+  key_name      = var.key_name
+  vpc_security_group_ids = [
+    aws_security_group.KafkaClientInstanceSG.id,
+  ]
+  user_data            = file("./kafka-client-msk.sh")
+  subnet_id            = aws_subnet.private_subnet[1].id
+  iam_instance_profile = aws_iam_instance_profile.KafkaClientIAM_Profile.name
   ebs_block_device {
     device_name           = "/dev/xvda"
     volume_size           = 100
@@ -51,7 +51,6 @@ resource "aws_instance" "Kafka-Client-EC2-Instance" {
     encrypted             = true
     kms_key_id            = aws_kms_key.msk-kms-key.arn
   }
-
   tags = merge(
     local.common-tags,
     map(

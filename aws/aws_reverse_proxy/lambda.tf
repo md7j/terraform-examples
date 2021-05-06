@@ -14,7 +14,6 @@ locals {
 # (see: "error creating CloudFront Distribution: InvalidLambdaFunctionAssociation: The function cannot have environment variables")
 data "template_file" "lambda" {
   template = "${file("${path.module}/lambda.tpl.js")}"
-
   vars = {
     config               = "${jsonencode(local.config)}"             # single quotes need to be escaped, lest we end up with a parse error on the JS side
     add_response_headers = "${jsonencode(var.add_response_headers)}" # ^ ditto
@@ -25,7 +24,6 @@ data "template_file" "lambda" {
 data "archive_file" "lambda_zip" {
   type        = "zip"
   output_path = "${path.module}/lambda.zip"
-
   source {
     filename = "lambda.js"
     content  = "${data.template_file.lambda.rendered}"
@@ -34,45 +32,40 @@ data "archive_file" "lambda_zip" {
 
 resource "aws_lambda_function" "viewer_request" {
   provider = "aws.us_east_1" # because: error creating CloudFront Distribution: InvalidLambdaFunctionAssociation: The function must be in region 'us-east-1'
-
   # lambda_zip.output_path will be absolute, i.e. different on different machines.
   # This can cause Terraform to notice differences that aren't actually there, so let's convert it to a relative one.
   # https://github.com/hashicorp/terraform/issues/7613#issuecomment-332238441
-  filename = "${substr(data.archive_file.lambda_zip.output_path, length(path.cwd) + 1, -1)}"
-
+  filename         = "${substr(data.archive_file.lambda_zip.output_path, length(path.cwd) + 1, -1)}"
   source_code_hash = "${data.archive_file.lambda_zip.output_base64sha256}"
   function_name    = "${local.prefix_with_domain}---viewer_request"
   role             = "${aws_iam_role.this.arn}"
   description      = "${var.comment_prefix}${var.site_domain} (request handler)"
   handler          = "lambda.viewer_request"
   runtime          = "nodejs8.10"
-  publish          = true                                                        # because: error creating CloudFront Distribution: InvalidLambdaFunctionAssociation: The function ARN must reference a specific function version. (The ARN must end with the version number.)
+  publish          = true # because: error creating CloudFront Distribution: InvalidLambdaFunctionAssociation: The function ARN must reference a specific function version. (The ARN must end with the version number.)
   tags             = "${var.tags}"
 }
 
 resource "aws_lambda_function" "viewer_response" {
   provider = "aws.us_east_1" # because: error creating CloudFront Distribution: InvalidLambdaFunctionAssociation: The function must be in region 'us-east-1'
-
   # lambda_zip.output_path will be absolute, i.e. different on different machines.
   # This can cause Terraform to notice differences that aren't actually there, so let's convert it to a relative one.
   # https://github.com/hashicorp/terraform/issues/7613#issuecomment-332238441
-  filename = "${substr(data.archive_file.lambda_zip.output_path, length(path.cwd) + 1, -1)}"
-
+  filename         = "${substr(data.archive_file.lambda_zip.output_path, length(path.cwd) + 1, -1)}"
   source_code_hash = "${data.archive_file.lambda_zip.output_base64sha256}"
   function_name    = "${local.prefix_with_domain}---viewer_response"
   role             = "${aws_iam_role.this.arn}"
   description      = "${var.comment_prefix}${var.site_domain} (response handler)"
   handler          = "lambda.viewer_response"
   runtime          = "nodejs8.10"
-  publish          = true                                                         # because: error creating CloudFront Distribution: InvalidLambdaFunctionAssociation: The function ARN must reference a specific function version. (The ARN must end with the version number.)
+  publish          = true # because: error creating CloudFront Distribution: InvalidLambdaFunctionAssociation: The function ARN must reference a specific function version. (The ARN must end with the version number.)
   tags             = "${var.tags}"
 }
 
 # Allow Lambda@Edge to invoke our functions
 resource "aws_iam_role" "this" {
-  name = "${local.prefix_with_domain}"
-  tags = "${var.tags}"
-
+  name               = "${local.prefix_with_domain}"
+  tags               = "${var.tags}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -94,9 +87,8 @@ EOF
 
 # Allow writing logs to CloudWatch from our functions
 resource "aws_iam_policy" "this" {
-  count = "${var.lambda_logging_enabled ? 1 : 0}"
-  name  = "${local.prefix_with_domain}"
-
+  count  = "${var.lambda_logging_enabled ? 1 : 0}"
+  name   = "${local.prefix_with_domain}"
   policy = <<EOF
 {
   "Version": "2012-10-17",

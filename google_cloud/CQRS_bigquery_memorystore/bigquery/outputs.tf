@@ -5,9 +5,11 @@ output "prober_ingress_table" {
 output "control_dataset" {
   value = google_bigquery_dataset.ingress
 }
+
 output "unified_values_table" {
   value = google_bigquery_table.unified_values
 }
+
 output "current_totals_latest_table" {
   value = google_bigquery_table.current_totals_latest
 }

@@ -1,5 +1,4 @@
 # Standard Variables
-
 variable "aws_region" {
   type    = string
   default = "us-east-1"
@@ -21,7 +20,6 @@ variable "application" {
 }
 
 # VPC Variables
-
 variable "vpc_cidr" {
   description = "VPC CIDR"
   type        = string
@@ -31,13 +29,13 @@ variable "private_subnet_cidrs" {
   description = "Private subnet  - CIDR"
   type        = list
 }
+
 variable "public_subnet_cidrs" {
   description = "Private subnet  - CIDR"
   type        = list
 }
 
 # MSK Cluster
-
 variable "msk_cluster_version" {
   type    = string
   default = "2.4.1.1"
@@ -67,7 +65,6 @@ variable "monitoring_type" {
 }
 
 # MSK Client
-
 variable "key_name" {
   type    = string
   default = "MSK-Keypair"

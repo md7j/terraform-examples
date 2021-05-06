@@ -13,16 +13,14 @@ resource "null_resource" "service_principal_layer" {
   ]
 }
 */
-
 resource "null_resource" "resource_group_layer" {
   provisioner "local-exec" {
     command = "echo === Created all resource groups"
   }
-
   depends_on = [
     # null_resource.service_principal_layer,
     azurerm_resource_group.network,
-    azurerm_resource_group.storage
+    azurerm_resource_group.storage,
   ]
 }
 
@@ -30,10 +28,9 @@ resource "null_resource" "network_layer" {
   provisioner "local-exec" {
     command = "echo === Created all virtual networks"
   }
-
   depends_on = [
     null_resource.resource_group_layer,
-    azurerm_virtual_network.network
+    azurerm_virtual_network.network,
   ]
 }
 
@@ -41,10 +38,9 @@ resource "null_resource" "subnet_layer" {
   provisioner "local-exec" {
     command = "echo === Created all subnets"
   }
-
   depends_on = [
     null_resource.network_layer,
-    azurerm_subnet.subnet
+    azurerm_subnet.subnet,
   ]
 }
 
@@ -52,7 +48,6 @@ resource "null_resource" "monitoring_layer" {
   provisioner "local-exec" {
     command = "echo === Created monitoring components"
   }
-
   depends_on = [
     null_resource.subnet_layer,
     # monitoring is a bit out of scope, but it would go here
@@ -65,7 +60,7 @@ resource "null_resource" "storage_layer" {
   }
   depends_on = [
     null_resource.monitoring_layer,
-    azurerm_storage_account.storage
+    azurerm_storage_account.storage,
   ]
 }
 

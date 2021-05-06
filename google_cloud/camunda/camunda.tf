@@ -1,9 +1,10 @@
-
 # Policy to allow public access to Cloud Run endpoint
 data "google_iam_policy" "noauth" {
   binding {
-    role    = "roles/run.invoker"
-    members = ["allUsers"]
+    role = "roles/run.invoker"
+    members = [
+      "allUsers",
+    ]
   }
 }
 
@@ -50,7 +51,6 @@ resource "google_cloud_run_service" "camunda" {
           # See https://github.com/GoogleCloudPlatform/cloud-sql-jdbc-socket-factory
           value = "jdbc:postgresql:///${google_sql_database.database.name}?cloudSqlInstance=${google_sql_database_instance.camunda-db.connection_name}&socketFactory=com.google.cloud.sql.postgres.SocketFactory"
         }
-
         env {
           name  = "DB_DRIVER"
           value = "org.postgresql.Driver"
@@ -83,7 +83,6 @@ resource "google_cloud_run_service" "camunda" {
         }
       }
     }
-
     metadata {
       annotations = {
         "autoscaling.knative.dev/maxScale"      = "1" # no clusting
@@ -91,7 +90,6 @@ resource "google_cloud_run_service" "camunda" {
       }
     }
   }
-
   traffic {
     percent         = 100
     latest_revision = true

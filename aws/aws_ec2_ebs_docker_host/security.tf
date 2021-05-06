@@ -10,14 +10,15 @@ resource "aws_security_group" "this" {
 }
 
 # Incoming SSH & outgoing ANY needs to be allowed for provisioning to work
-
 resource "aws_security_group_rule" "outgoing_any" {
   security_group_id = "${aws_security_group.this.id}"
   type              = "egress"
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = [
+    "0.0.0.0/0",
+  ]
 }
 
 resource "aws_security_group_rule" "incoming_ssh" {
@@ -26,11 +27,12 @@ resource "aws_security_group_rule" "incoming_ssh" {
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = [
+    "0.0.0.0/0",
+  ]
 }
 
 # The rest of the security rules are opt-in
-
 resource "aws_security_group_rule" "incoming_http" {
   count             = "${var.allow_incoming_http ? 1 : 0}"
   security_group_id = "${aws_security_group.this.id}"
@@ -38,7 +40,9 @@ resource "aws_security_group_rule" "incoming_http" {
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = [
+    "0.0.0.0/0",
+  ]
 }
 
 resource "aws_security_group_rule" "incoming_https" {
@@ -48,7 +52,9 @@ resource "aws_security_group_rule" "incoming_https" {
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = [
+    "0.0.0.0/0",
+  ]
 }
 
 resource "aws_security_group_rule" "incoming_dns_tcp" {
@@ -58,7 +64,9 @@ resource "aws_security_group_rule" "incoming_dns_tcp" {
   from_port         = 53
   to_port           = 53
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = [
+    "0.0.0.0/0",
+  ]
 }
 
 resource "aws_security_group_rule" "incoming_dns_udp" {
@@ -68,5 +76,7 @@ resource "aws_security_group_rule" "incoming_dns_udp" {
   from_port         = 53
   to_port           = 53
   protocol          = "udp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = [
+    "0.0.0.0/0",
+  ]
 }

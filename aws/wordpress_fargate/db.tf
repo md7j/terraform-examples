@@ -4,10 +4,12 @@ resource "random_string" "snapshot_suffix" {
 }
 
 resource "aws_rds_cluster" "this" {
-  cluster_identifier      = "${var.prefix}-${var.environment}"
-  engine                  = "aurora"
-  engine_mode             = "serverless"
-  vpc_security_group_ids  = [aws_security_group.db.id]
+  cluster_identifier = "${var.prefix}-${var.environment}"
+  engine             = "aurora"
+  engine_mode        = "serverless"
+  vpc_security_group_ids = [
+    aws_security_group.db.id,
+  ]
   db_subnet_group_name    = aws_db_subnet_group.this.name
   engine_version          = var.db_engine_version
   availability_zones      = data.aws_availability_zones.this.names
@@ -41,14 +43,14 @@ resource "aws_security_group" "db" {
     to_port   = 3306
     self      = true
   }
-
   egress {
-    protocol    = "-1"
-    from_port   = 0
-    to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
+    protocol  = "-1"
+    from_port = 0
+    to_port   = 0
+    cidr_blocks = [
+      "0.0.0.0/0",
+    ]
   }
-
   lifecycle {
     create_before_destroy = true
   }

@@ -1,6 +1,5 @@
 output "bucket_name" {
   description = "The name of the S3 bucket that's used for hosting the content (either auto-generated or externally provided)"
-
   # Terraform isn't particularly helpful when you want to depend on the existence of a resource which may have count 0 or 1, like our bucket.
   # This is a hacky way of only resolving the bucket_name output once the bucket exists (if created by us).
   # https://github.com/hashicorp/terraform/issues/16580#issuecomment-342573652

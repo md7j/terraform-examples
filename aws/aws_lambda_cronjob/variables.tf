@@ -49,7 +49,6 @@ variable "function_runtime" {
 variable "function_env_vars" {
   description = "Which env vars (if any) to invoke the Lambda with"
   type        = "map"
-
   default = {
     # This effectively useless, but an empty map can't be used in the "aws_lambda_function" resource
     # -> this is 100% safe to override with your own env, should you need one

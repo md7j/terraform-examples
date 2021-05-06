@@ -1,8 +1,7 @@
 # Allow Lambda to invoke our functions:
 resource "aws_iam_role" "this" {
-  name = "${local.prefix_with_domain}"
-  tags = "${var.tags}"
-
+  name               = "${local.prefix_with_domain}"
+  tags               = "${var.tags}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -33,9 +32,8 @@ resource "aws_lambda_permission" "this" {
 
 # Allow writing logs to CloudWatch from our functions:
 resource "aws_iam_policy" "this" {
-  count = "${var.lambda_logging_enabled ? 1 : 0}"
-  name  = "${local.prefix_with_domain}"
-
+  count  = "${var.lambda_logging_enabled ? 1 : 0}"
+  name   = "${local.prefix_with_domain}"
   policy = <<EOF
 {
   "Version": "2012-10-17",
